@@ -258,7 +258,7 @@ export default function DirectoryScanner() {
           </button>
           <button
             type="button"
-            // disabled={!directory || loading}
+            disabled={selectedKeys != "all" && selectedKeys.size == 0}
             onClick={handleScanSelectedFile}
             className="inline-flex h-fit mt-auto ml-auto w-fit items-center gap-2 rounded-lg border border-cyan-700 bg-cyan-600 px-3 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-cyan-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-300 dark:disabled:border-slate-600 dark:disabled:bg-slate-700">
             {loading ? "Memindai..." : "Scan"} <ScanQrCode size={20} aria-hidden="true" />
