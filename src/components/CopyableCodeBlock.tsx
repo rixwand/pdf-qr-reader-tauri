@@ -13,14 +13,16 @@ export default function CopyableCodeBlock({ children, slim = false }: { children
   return (
     <div
       className={cn(
-        "relative group rounded-lg bg-neutral-200 dark:bg-default-50/10 border border-default-200",
+        "relative group rounded-lg bg-neutral-200 dark:bg-slate-700/50 border border-default-200",
         slim ? "p-1" : "p-4",
       )}>
       {/* Corner Copy Button */}
       <div className={cn("absolute", slim ? "top-0 right-1" : "top-2 right-2")}>
         <Button
           size="sm"
-          className={"text-neutral-700 data-[focus-visible=true]:ring-offset-0 data-[focus-visible=true]:ring-0"}
+          className={
+            "text-neutral-700 dark:text-slate-300 data-[focus-visible=true]:ring-offset-0 data-[focus-visible=true]:ring-0"
+          }
           variant="ghost"
           isIconOnly
           aria-label="Copy code"
@@ -30,7 +32,7 @@ export default function CopyableCodeBlock({ children, slim = false }: { children
       </div>
 
       {/* Multiline Code Surface */}
-      <pre className="overflow-x-auto font-mono text-sm leading-relaxed pr-10 text-neutral-800">
+      <pre className="overflow-x-auto font-mono text-sm leading-relaxed pr-10 dark:text-slate-300 text-neutral-800">
         <code ref={codeRef}>{children}</code>
       </pre>
     </div>

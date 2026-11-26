@@ -21,6 +21,7 @@ import { FolderOpen, Inbox, ScanQrCode, Search, SlidersHorizontal, X } from "luc
 import { getLocalTimeZone, type CalendarDate } from "@internationalized/date";
 import { useState } from "react";
 
+import { path } from "@tauri-apps/api";
 import { QrCodeResult, scanPdfQrs } from "../lib/scanPdfQrs";
 import type { FileEntry, ScanOptions } from "../types/file";
 import ScanButton from "./ScanButton";
@@ -104,14 +105,15 @@ export default function DirectoryScanner() {
     }
   }
 
-  async function handleScanQr(path: string) {
+  async function handleScanQr(filePath: string) {
     try {
-      const pdfData = await readFile(path);
+      const pdfData = await readFile(filePath);
       const qrCodes = await scanPdfQrs(pdfData);
-      const arrPath = path.split("/");
+      const fileName = await path.basename(filePath);
+      console.log("Array splitted path :", fileName);
       setScanned(current => {
         const next = new Map(current);
-        next.set(arrPath[arrPath.length - 1], qrCodes);
+        next.set(fileName, qrCodes);
         return next;
       });
     } catch (scanError) {

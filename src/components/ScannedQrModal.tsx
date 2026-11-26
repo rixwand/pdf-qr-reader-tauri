@@ -42,6 +42,7 @@ export default function ScannedQrModal({
     );
 
     setSplittedData(newSplitted);
+    console.log({ selectedKeys, scanned, files, rawData, splittedData });
   }, [selectedKeys, scanned, files]);
   return (
     <Modal state={state}>
@@ -125,7 +126,9 @@ export default function ScannedQrModal({
             </Modal.Body>
             {!scanning && (
               <Modal.Footer>
-                <Button slot="close">Tutup</Button>
+                <Button className={"dark:bg-cyan-600"} slot="close">
+                  Tutup
+                </Button>
               </Modal.Footer>
             )}
           </Modal.Dialog>
