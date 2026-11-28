@@ -2,7 +2,16 @@ import { Button, cn } from "@heroui/react";
 import { Check, Copy } from "lucide-react";
 import { ReactNode, useRef, useState } from "react";
 
-export default function CopyableCodeBlock({ children, slim = false }: { children: ReactNode; slim?: boolean }) {
+export default function CopyableCodeBlock({
+  children,
+  overflowing = "scroll",
+  slim = false,
+}: {
+  children: ReactNode;
+  slim?: boolean;
+  wrapped?: boolean;
+  overflowing?: "scroll" | "wrapped" | "folded";
+}) {
   const [copied, setCopied] = useState(false);
   const codeRef = useRef<HTMLElement>(null);
   const handleCopy = async () => {
@@ -32,7 +41,15 @@ export default function CopyableCodeBlock({ children, slim = false }: { children
       </div>
 
       {/* Multiline Code Surface */}
-      <pre className="overflow-x-auto font-mono text-sm leading-relaxed pr-10 dark:text-slate-300 text-neutral-800">
+      <pre
+        className={cn(
+          overflowing == "wrapped"
+            ? "whitespace-pre-wrap wrap-break-word"
+            : overflowing == "folded"
+              ? "text-ellipsis overflow-x-hidden text-nowrap"
+              : "overflow-x-auto",
+          "font-mono text-sm leading-relaxed pr-10 dark:text-slate-300 text-neutral-800",
+        )}>
         <code ref={codeRef}>{children}</code>
       </pre>
     </div>

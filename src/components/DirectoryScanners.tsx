@@ -6,6 +6,7 @@ import {
   EmptyState,
   Input,
   Selection,
+  SortDescriptor,
   Table,
   TableLayout,
   Virtualizer,
@@ -19,7 +20,7 @@ import { readFile } from "@tauri-apps/plugin-fs";
 import { FolderOpen, Inbox, ScanQrCode, Search, SlidersHorizontal, X } from "lucide-react";
 
 import { getLocalTimeZone, type CalendarDate } from "@internationalized/date";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { path } from "@tauri-apps/api";
 import { QrCodeResult, scanPdfQrs } from "../lib/scanPdfQrs";
@@ -56,6 +57,10 @@ export default function DirectoryScanner() {
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
   const [scanned, setScanned] = useState<Map<string, QrCodeResult[]>>(() => new Map());
   const [scanningMultiple, setScanningMultiple] = useState(false);
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+    column: "name",
+    direction: "ascending",
+  });
 
   async function selectDirectory() {
     const selected = await open({
@@ -139,6 +144,20 @@ export default function DirectoryScanner() {
     }
     setScanningMultiple(false);
   }
+
+  const sortedItems = useMemo(() => {
+    return [...files].sort((a, b) => {
+      const first = a[sortDescriptor.column as keyof FileEntry];
+      const second = b[sortDescriptor.column as keyof FileEntry];
+      let cmp = 0;
+      if (typeof first === "number" && typeof second === "number") {
+        cmp = first - second;
+      } else {
+        cmp = String(first).localeCompare(String(second));
+      }
+      return sortDescriptor.direction === "descending" ? -cmp : cmp;
+    });
+  }, [sortDescriptor, files]);
 
   return (
     <section className="w-full space-y-4 text-left">
@@ -283,6 +302,8 @@ export default function DirectoryScanner() {
         <Table className="bg-transparent">
           <Table.ScrollContainer className="border border-slate-300 shadow-sm dark:border-slate-700 rounded-2xl">
             <Table.Content
+              sortDescriptor={sortDescriptor}
+              onSortChange={setSortDescriptor}
               aria-label="File list table"
               className="min-w-150 h-[calc(100vh-20rem)] overflow-auto"
               selectedKeys={selectedKeys}
@@ -298,8 +319,16 @@ export default function DirectoryScanner() {
                     </Checkbox.Content>
                   </Checkbox>
                 </Table.Column>
-                <Table.Column isRowHeader>Name</Table.Column>
-                <Table.Column>Diubah</Table.Column>
+                <Table.Column isRowHeader allowsSorting id={"name"}>
+                  {({ sortDirection }) => (
+                    <Table.SortableColumnHeader sortDirection={sortDirection}>Nama</Table.SortableColumnHeader>
+                  )}
+                </Table.Column>
+                <Table.Column isRowHeader allowsSorting id={"modifiedAt"}>
+                  {({ sortDirection }) => (
+                    <Table.SortableColumnHeader sortDirection={sortDirection}>Diubah</Table.SortableColumnHeader>
+                  )}
+                </Table.Column>
                 <Table.Column>Ukuran</Table.Column>
                 <Table.Column className={"pe-0"} maxWidth={150}>
                   Aksi
@@ -313,7 +342,7 @@ export default function DirectoryScanner() {
                   </EmptyState>
                 )}
                 className={"rounded-none dark:bg-cyan-700 bg-cyan-600"}>
-                {files.map(file => (
+                {sortedItems.map(file => (
                   <Table.Row key={file.name} id={file.name}>
                     <Table.Cell className={cn("cell")}>
                       <Checkbox id="custom" aria-label={`Select ${file.name}`} slot="selection">

@@ -5,6 +5,7 @@ import { Fragment } from "react/jsx-runtime";
 import { QrCodeResult } from "../lib/scanPdfQrs";
 import { FileEntry } from "../types/file";
 import CopyableCodeBlock from "./CopyableCodeBlock";
+import SplittedQrResult from "./SplittedQrResult";
 
 export default function ScannedQrModal({
   state,
@@ -19,7 +20,7 @@ export default function ScannedQrModal({
   scanned: Map<string, QrCodeResult[]>;
   scanning: boolean;
 }) {
-  const [selectedTab, setSelectedTab] = useState<Key>("joined");
+  const [selectedTab, setSelectedTab] = useState<Key>("split");
   const [rawData, setRawData] = useState<Map<string, QrCodeResult[]>>(new Map());
   const [splittedData, setSplittedData] = useState<string[][]>([]);
   useEffect(() => {
@@ -40,9 +41,7 @@ export default function ScannedQrModal({
     const newSplitted: string[][] = Array.from({ length: maxLength }, (_, i) =>
       values.map(v => v[i]?.text).filter((text): text is string => text !== undefined),
     );
-
     setSplittedData(newSplitted);
-    console.log({ selectedKeys, scanned, files, rawData, splittedData });
   }, [selectedKeys, scanned, files]);
   return (
     <Modal state={state}>
@@ -63,15 +62,15 @@ export default function ScannedQrModal({
                         <Tabs.ListContainer>
                           <Tabs.List aria-label="Navigation" className="gap-1 p-0.5">
                             <Tabs.Tab
-                              id="joined"
-                              className="h-8 w-8 min-w-0 p-0 flex items-center justify-center rounded-lg">
-                              <SquareText size={16} />
-                              <Tabs.Indicator />
-                            </Tabs.Tab>
-                            <Tabs.Tab
                               id="split"
                               className="h-8 w-8 min-w-0 p-0 flex items-center justify-center rounded-lg">
                               <SquareSplitHorizontal size={16} />
+                              <Tabs.Indicator />
+                            </Tabs.Tab>
+                            <Tabs.Tab
+                              id="joined"
+                              className="h-8 w-8 min-w-0 p-0 flex items-center justify-center rounded-lg">
+                              <SquareText size={16} />
                               <Tabs.Indicator />
                             </Tabs.Tab>
                             <Tabs.Tab
@@ -98,10 +97,8 @@ export default function ScannedQrModal({
                   </div>
                 </Fragment>
               ) : selectedTab == "split" ? (
-                <div className="flex gap-x-2">
-                  {splittedData.map(row => (
-                    <CopyableCodeBlock>{row.join("\n")}</CopyableCodeBlock>
-                  ))}
+                <div className="flex justify-between">
+                  <SplittedQrResult result={splittedData} />
                 </div>
               ) : selectedTab == "show-filename" ? (
                 <div className="space-y-1.5">

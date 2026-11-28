@@ -1,8 +1,9 @@
-import { Button, Code, Popover, Spinner, toast } from "@heroui/react";
-import { ClipboardCheck, Copy, QrCode } from "lucide-react";
+import { Button, Popover, Spinner } from "@heroui/react";
+import { QrCode } from "lucide-react";
 import { useState } from "react";
 import { QrCodeResult } from "../lib/scanPdfQrs";
 import { FileEntry } from "../types/file";
+import CopyableCodeBlock from "./CopyableCodeBlock";
 
 export default function ScanButton({
   scanned,
@@ -59,19 +60,9 @@ export default function ScanButton({
 
           <div className="flex flex-col gap-y-1">
             {scanned.get(file.name)?.map((qr, index) => (
-              <Code key={index} className="flex justify-between gap-x-3 py-1.5 px-2">
+              <CopyableCodeBlock overflowing="wrapped" slim key={index}>
                 {qr.text}
-                <button
-                  aria-label={`Copy QR code from ${file.name}`}
-                  onClick={() => {
-                    navigator.clipboard.writeText(qr.text);
-                    toast("Text Disalin", {
-                      indicator: <ClipboardCheck size={18} />,
-                    });
-                  }}>
-                  <Copy size={14} />
-                </button>
-              </Code>
+              </CopyableCodeBlock>
             ))}
           </div>
         </Popover.Dialog>
